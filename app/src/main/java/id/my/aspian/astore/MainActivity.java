@@ -28,12 +28,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Status Bar
-        Window window = getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
         // end
 
-        // Fragment init
-        FrameLayout frame_layout = findViewById(R.id.main_frame);
+        // Fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
         // end
 
@@ -55,30 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
-
-        // List Category
-//        ListView list_category = findViewById(R.id.list_category);
-//        list_category.setOnItemClickListener((parent, view, position, id) -> {
-//            String category_id = ((TextView) view.findViewById(R.id.category_id)).getText().toString();
-//            toast(this, category_id);
-//        });
         // end
-
-//        tmp_data();
     }
-
-//    public void tmp_data() {
-//        ArrayList<HashMap<String, String>> list = new ArrayList<>();
-//
-//        for (int i = 1; i <= 10; i++) {
-//            HashMap<String, String> map = new HashMap<>();
-//            map.put("category_id", "" + i);
-//            map.put("category_title", "Title" + i);
-//            map.put("product_available", "0" + i);
-//
-//            list.add(map);
-//        }
-//
-//        ((ListView) findViewById(R.id.list_category)).setAdapter(new SimpleAdapter(this, list, R.layout.list_category, new String[]{"category_id", "category_title", "product_available"}, new int[]{R.id.category_id, R.id.category_title, R.id.product_available}));
-//    }
 }

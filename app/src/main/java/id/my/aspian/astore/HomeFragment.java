@@ -1,5 +1,7 @@
 package id.my.aspian.astore;
 
+import static id.my.aspian.astore.Utils.toast;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +9,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,7 +33,6 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     public HomeFragment() {
-        // Required empty public constructor
     }
 
     /**
@@ -56,9 +63,38 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        ListView list_category = view.findViewById(R.id.list_category);
+        list_category.setOnItemClickListener((parent, category_view, position, id) -> {
+            String category_id = ((TextView) category_view.findViewById(R.id.category_id)).getText().toString();
+            toast(getContext(), category_id);
+        });
+
+        tmp_data(view);
+
+        return view;
+    }
+
+    public void tmp_data(View view) {
+        ArrayList<HashMap<String, String>> list = new ArrayList<>();
+
+        for (int i = 1; i <= 50; i++) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("category_id", "" + i);
+            map.put("category_title", "Title" + i);
+            map.put("product_available", "0" + i);
+
+            list.add(map);
+        }
+
+        SimpleAdapter adapter = new SimpleAdapter(
+            getContext(), list, R.layout.list_category,
+            new String[]{"category_id", "category_title", "product_available"},
+            new int[]{R.id.category_id, R.id.category_title, R.id.product_available}
+        );
+
+        ((ListView) view.findViewById(R.id.list_category)).setAdapter(adapter);
     }
 }
