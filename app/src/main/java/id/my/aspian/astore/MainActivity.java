@@ -1,18 +1,13 @@
 package id.my.aspian.astore;
 
-import static id.my.aspian.astore.Utils.execute;
-
 import android.os.Bundle;
-import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

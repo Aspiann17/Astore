@@ -1,12 +1,18 @@
 package id.my.aspian.astore;
 
 import static id.my.aspian.astore.Utils.execute;
+import static id.my.aspian.astore.Utils.format;
+import static id.my.aspian.astore.Utils.star;
+import static id.my.aspian.astore.Utils.toast;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -23,6 +29,24 @@ import java.util.Objects;
 public class ProductActivity extends AppCompatActivity {
     StoreDatabase db;
     ProductDao productDao;
+
+    // Toolbar Option
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int item_id = item.getItemId();
+
+        if (item_id == R.id.add_product) {
+            toast(this, "ehe");
+        }
+
+        return false;
+    }
+    // end
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,12 +107,13 @@ public class ProductActivity extends AppCompatActivity {
             HashMap<String, String> map = new HashMap<>();
             map.put("product_id", product.id + "");
             map.put("product_name", product.name);
-            map.put("product_price", "" + product.price);
-            map.put("product_rating", "" + product.rating);
+            map.put("product_price", format(product.price));
+            map.put("product_rating", star(product.rating));
             map.put("product_category", "" + product.rating);
             map.put("product_description", product.description);
             list.add(map);
         }
+
         return list;
     }
 }

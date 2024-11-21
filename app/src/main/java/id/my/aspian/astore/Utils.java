@@ -30,4 +30,8 @@ public class Utils {
     public static void execute(Runnable runnable) {
         executor.execute(runnable);
     }
+
+    public static String star(int rating) {
+        return rating + " ★";
+    }
 }
