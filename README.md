@@ -2,10 +2,10 @@
 
 # Reference
 ## Theming
-Thanks to [Ikmal](https://github.com/Malsoryz/)
+Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - [Material](https://m3.material.io/)
 - https://developer.android.com/develop/ui/views/theming/themes?hl=id
-## Component
+## -
 - Fragment
   - https://youtu.be/m-PefJ2CcR8?si=8sCJHgxzU8-NQk_7
   - https://developer.android.com/guide/fragments/?hl=id
@@ -15,5 +15,7 @@ Thanks to [Ikmal](https://github.com/Malsoryz/)
     - https://developer.android.com/guide/fragments/animate?hl=id
     - https://stackoverflow.com/questions/4932462/animate-the-transition-between-fragments
 - [Tombol Aksi Mengambang](https://developer.android.com/develop/ui/views/components/floating-action-button?hl=id)
-- [TabLayout](https://developer.android.com/reference/com/google/android/material/tabs/TabLayout)
+- [Tab Layout](https://developer.android.com/reference/com/google/android/material/tabs/TabLayout)
 - [Bottom Navigation](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomNavigation.md)
+- [Toolbar Back Arrow](https://stackoverflow.com/questions/26651602/display-back-arrow-on-toolbar)
+- [DAO](https://developer.android.com/training/data-storage/room?hl=id#java)

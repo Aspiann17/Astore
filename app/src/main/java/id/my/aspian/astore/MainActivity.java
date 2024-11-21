@@ -1,15 +1,15 @@
 package id.my.aspian.astore;
 
 import android.os.Bundle;
-import android.view.Window;
-import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Status Bar
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.blue));
         // end
 
         // Fragment
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
             if (item_id == R.id.nav_home) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
                 return true;
+            } else if (item_id == R.id.nav_cart) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new CartFragment()).commit();
+                return true;
             } else if (item_id == R.id.nav_order) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new OrderFragment()).commit();
                 return true;
@@ -54,5 +58,18 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
         // end
+
+        // Database (DAO)
+        StoreDatabase db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
+        ProductDao productDao = db.productDao();
+        // end
+
+        // Toolbar Back Button
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//
+//        ActionBar toolbar = getSupportActionBar();
+//        if (toolbar != null) {
+//            toolbar.setTitle("");
+//        }
     }
 }
