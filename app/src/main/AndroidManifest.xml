@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Astore"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ProductActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -22,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

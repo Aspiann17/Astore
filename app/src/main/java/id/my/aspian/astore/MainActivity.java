@@ -1,6 +1,9 @@
 package id.my.aspian.astore;
 
+import static id.my.aspian.astore.Utils.execute;
+
 import android.os.Bundle;
+import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
@@ -58,18 +61,5 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
         // end
-
-        // Database (DAO)
-        StoreDatabase db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
-        ProductDao productDao = db.productDao();
-        // end
-
-        // Toolbar Back Button
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//
-//        ActionBar toolbar = getSupportActionBar();
-//        if (toolbar != null) {
-//            toolbar.setTitle("");
-//        }
     }
 }
