@@ -1,11 +1,8 @@
 package id.my.aspian.astore;
 
-import static id.my.aspian.astore.Utils.toast;
-
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -69,12 +66,10 @@ public class HomeFragment extends Fragment {
 
         ListView list_category = view.findViewById(R.id.list_category);
         list_category.setOnItemClickListener((parent, category_view, position, id) -> {
-            String category_id = ((TextView) category_view.findViewById(R.id.category_id)).getText().toString();
             String category_title = ((TextView) category_view.findViewById(R.id.category_title)).getText().toString();
 
             Intent intent = new Intent(getContext(), ProductActivity.class);
-            intent.putExtra("category_id", category_id);
-            intent.putExtra("category_title", category_title);
+            intent.putExtra("category", category_title);
             startActivity(intent);
         });
 

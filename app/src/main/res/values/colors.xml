@@ -4,7 +4,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="blue">#0D6EFD</color>
+    <color name="red">#DC3545</color>
     <color name="blue_dark">@color/blue</color>
 
     <color name="primary">@color/blue</color>
+    <color name="secondary">@color/white</color>
+    <color name="danger">@color/red</color>
 </resources>

@@ -33,4 +33,6 @@ public class Product {
         this.category = category;
         this.description = description;
     }
+
+    public Product() {}
 }

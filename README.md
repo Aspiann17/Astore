@@ -19,3 +19,4 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - [Bottom Navigation](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomNavigation.md)
 - [Toolbar Back Arrow](https://stackoverflow.com/questions/26651602/display-back-arrow-on-toolbar)
 - [DAO](https://developer.android.com/training/data-storage/room?hl=id#java)
+- https://stackoverflow.com/questions/12483508/setemptyview-on-listview-not-showing-its-view-in-a-android-app

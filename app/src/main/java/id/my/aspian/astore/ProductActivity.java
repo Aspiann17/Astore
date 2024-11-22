@@ -5,6 +5,7 @@ import static id.my.aspian.astore.Utils.format;
 import static id.my.aspian.astore.Utils.star;
 import static id.my.aspian.astore.Utils.toast;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,10 +29,17 @@ import java.util.Objects;
 
 public class ProductActivity extends AppCompatActivity {
     StoreDatabase db;
-    ProductDao productDao;
 
-    // Toolbar Option
+    // Toolbar
 
+    // Back Button
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    // Option
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
         return true;
@@ -41,7 +49,9 @@ public class ProductActivity extends AppCompatActivity {
         int item_id = item.getItemId();
 
         if (item_id == R.id.add_product) {
-            toast(this, "ehe");
+            Dialog dialog = new Dialog(ProductActivity.this);
+            dialog.setContentView(R.layout.dialog_product_input);
+            dialog.show();
         }
 
         return false;
@@ -54,37 +64,37 @@ public class ProductActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_product);
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.blue));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // Database
         db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
-        productDao = db.productDao();
+        // end
 
         // Intent Data
         Bundle intent_data = getIntent().getExtras();
-        String category_id, category_title = null;
+        String category = null;
 
-        if (intent_data != null) {
-            category_id = intent_data.getString("category_id");
-            category_title = intent_data.getString("category_title");
-        }
+        if (intent_data != null) category = intent_data.getString("category");
         // end
 
         // Toolbar
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         ActionBar toolbar = getSupportActionBar();
         if (toolbar != null) {
-            toolbar.setTitle(category_title);
+            toolbar.setTitle(category);
         }
         // end
 
         // List Product
+        ListView list_product = findViewById(R.id.list_product);
+        list_product.setEmptyView(findViewById(R.id.empty_product));
         execute(() -> {
-            ((ListView) findViewById(R.id.list_product)).setAdapter(new SimpleAdapter(
+            list_product.setAdapter(new SimpleAdapter(
                     this, parse_data(), R.layout.list_products,
                     new String[]{"product_name", "product_price", "product_rating", "product_category", "product_description"},
                     new int[]{R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
@@ -93,17 +103,10 @@ public class ProductActivity extends AppCompatActivity {
         // end
     }
 
-    // Toolbar Back Button
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-
     private ArrayList<Map<String, String>> parse_data() {
         ArrayList<Map<String, String>> list = new ArrayList<>();
 
-        for (Product product : productDao.getAll()) {
+        for (Product product : db.productDao().getAll()) {
             HashMap<String, String> map = new HashMap<>();
             map.put("product_id", product.id + "");
             map.put("product_name", product.name);

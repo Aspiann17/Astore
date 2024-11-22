@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Astore</string>
     <string name="none">N/A</string>
+    <string name="later">Coming Soon</string>
+    <string name="star">★</string>
 </resources>
