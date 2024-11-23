@@ -16,8 +16,11 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :id")
     Product get(int id);
 
-//    @Query("SELECT * FROM products WHERE category = :category")
-//    List<Product> get(String category);
+    @Query("SELECT * FROM products WHERE category = :category")
+    List<Product> get(String category);
+
+    @Query("SELECT COUNT(*) FROM products WHERE category = :category")
+    int count(String category);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Product product);

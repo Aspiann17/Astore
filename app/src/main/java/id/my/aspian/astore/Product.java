@@ -51,4 +51,22 @@ public class Product {
 
         return list;
     }
+
+    public static ArrayList<Map<String, String>> get_all(StoreDatabase db, String category) {
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+        List<Product> product_data = db.productDao().get(category);
+
+        for (Product product : product_data) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("product_id", product.id + "");
+            map.put("product_name", product.name);
+            map.put("product_price", format(product.price));
+            map.put("product_rating", star(product.rating));
+            map.put("product_category", String.valueOf(product.rating));
+            map.put("product_description", product.description);
+            list.add(map);
+        }
+
+        return list;
+    }
 }

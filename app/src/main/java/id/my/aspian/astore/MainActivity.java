@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
+        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
@@ -29,11 +31,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
-
-        // Status Bar
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue));
-        getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
-        // end
 
         // Fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
@@ -61,20 +58,5 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
         // end
-
-//        Dialog dialog = new Dialog(this);
-//        dialog.setContentView(R.layout.dialog_product_input);
-//        dialog.show();
-
-//        execute(() -> {
-//            Product product = new Product();
-//            product.name = "Rawr";
-//            product.price = 2000;
-//            product.rating = 5;
-//            product.category = "Cloth";
-//            product.description = "Tidak ada";
-//
-//            db.productDao().insert(product);
-//        });
     }
 }

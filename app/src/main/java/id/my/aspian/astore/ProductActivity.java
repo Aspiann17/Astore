@@ -25,6 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -242,15 +243,15 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     private void show_product() {
-        product_data = Product.get_all(db);
+        product_data = Product.get_all(db, category.toLowerCase());
 
         if (product_data.isEmpty()) return;
 
         runOnUiThread(() -> {
             list_product.setAdapter(new SimpleAdapter(
-                    this, product_data, R.layout.list_products,
-                    new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
-                    new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
+                this, product_data, R.layout.list_products,
+                new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
+                new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
             ));
         });
     }

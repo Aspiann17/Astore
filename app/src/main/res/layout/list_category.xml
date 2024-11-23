@@ -6,7 +6,7 @@
     android:layout_height="180dp"
     android:layout_margin="16dp"
     app:cardBackgroundColor="@color/blue">
-    
+
     <TextView
         android:id="@+id/category_id"
         android:layout_width="wrap_content"

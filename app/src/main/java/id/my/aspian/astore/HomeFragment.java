@@ -1,9 +1,13 @@
 package id.my.aspian.astore;
 
+import static id.my.aspian.astore.Utils.execute;
+
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +26,9 @@ import java.util.HashMap;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+    StoreDatabase db;
+    ListView list_category;
+    SwipeRefreshLayout refresh_layout;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -52,6 +60,13 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        execute(this::show_card);
+        refresh_layout.setRefreshing(false);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -62,9 +77,17 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        db = Room.databaseBuilder(requireActivity(), StoreDatabase.class, "store").build();
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        ListView list_category = view.findViewById(R.id.list_category);
+        refresh_layout = view.findViewById(R.id.refresh_layout);
+        refresh_layout.setOnRefreshListener(() -> {
+            execute(this::show_card);
+            refresh_layout.setRefreshing(false);
+        });
+
+        list_category = view.findViewById(R.id.list_category);
         list_category.setOnItemClickListener((parent, category_view, position, id) -> {
             String category_title = ((TextView) category_view.findViewById(R.id.category_title)).getText().toString();
 
@@ -73,29 +96,29 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        tmp_data(view);
-
+        execute(this::show_card);
         return view;
     }
 
-    public void tmp_data(View view) {
+    private void show_card() {
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
+        String[] category = new String[]{
+                "Foods", "Drinks", "Cloth", "Electronic"
+        };
 
-        for (int i = 1; i <= 50; i++) {
+        for (String c : category) {
             HashMap<String, String> map = new HashMap<>();
-            map.put("category_id", "" + i);
-            map.put("category_title", "Title" + i);
-            map.put("product_available", "0" + i);
-
+            map.put("category_title", c);
+            map.put("category_count", String.valueOf(db.productDao().count(c.toLowerCase())));
             list.add(map);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(
-            getContext(), list, R.layout.list_category,
-            new String[]{"category_id", "category_title", "product_available"},
-            new int[]{R.id.category_id, R.id.category_title, R.id.product_available}
-        );
-
-        ((ListView) view.findViewById(R.id.list_category)).setAdapter(adapter);
+        requireActivity().runOnUiThread(() -> {
+            list_category.setAdapter(new SimpleAdapter(
+                    getContext(), list, R.layout.list_category,
+                    new String[]{"category_title", "category_count"},
+                    new int[]{R.id.category_title, R.id.product_available}
+            ));
+        });
     }
 }
