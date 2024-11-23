@@ -1,9 +1,13 @@
 package id.my.aspian.astore;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -15,6 +19,28 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     StoreDatabase db;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
+    // Option
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int item_id = item.getItemId();
+        if (item_id == R.id.admin_mode) {
+            editor.putString("role", "admin");
+        } else if (item_id == R.id.user_mode) {
+            editor.putString("role", "user");
+        }
+
+        editor.apply();
+
+        return true;
+    }
+    // end
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+        // end
+
+        // Preferences
+        preferences = getSharedPreferences("session", MODE_PRIVATE);
+        editor = preferences.edit();
         // end
     }
 }

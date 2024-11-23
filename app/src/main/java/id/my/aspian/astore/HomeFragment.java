@@ -88,6 +88,7 @@ public class HomeFragment extends Fragment {
         });
 
         list_category = view.findViewById(R.id.list_category);
+        list_category.setEmptyView(view.findViewById(R.id.empty_category));
         list_category.setOnItemClickListener((parent, category_view, position, id) -> {
             String category_title = ((TextView) category_view.findViewById(R.id.category_title)).getText().toString();
 
@@ -115,9 +116,9 @@ public class HomeFragment extends Fragment {
 
         requireActivity().runOnUiThread(() -> {
             list_category.setAdapter(new SimpleAdapter(
-                    getContext(), list, R.layout.list_category,
-                    new String[]{"category_title", "category_count"},
-                    new int[]{R.id.category_title, R.id.product_available}
+                getContext(), list, R.layout.list_category,
+                new String[]{"category_title", "category_count"},
+                new int[]{R.id.category_title, R.id.product_available}
             ));
         });
     }

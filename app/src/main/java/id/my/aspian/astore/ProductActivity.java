@@ -4,9 +4,11 @@ import static id.my.aspian.astore.Utils.execute;
 import static id.my.aspian.astore.Utils.toast;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -25,19 +27,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class ProductActivity extends AppCompatActivity {
-    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description;
+    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description, raw_product_amount;
     SwipeRefreshLayout refresh_layout;
     ListView list_product;
-    Dialog dialog;
+    Dialog admin_dialog, user_dialog;
 
     StoreDatabase db;
+    SharedPreferences preferences;
     ArrayList<Map<String, String>> product_data;
-    String category, action, product_id = null;
+    String category, action, product_id, role = null;
 
 
     // Toolbar
@@ -50,7 +52,7 @@ public class ProductActivity extends AppCompatActivity {
 
     // Option
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
+        if (role.equals("admin")) getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
         return true;
     }
 
@@ -66,7 +68,7 @@ public class ProductActivity extends AppCompatActivity {
             }) i.setText("");
 
             action = "add";
-            dialog.show();
+            admin_dialog.show();
         } else if (item_id == R.id.add_tmp_product) {
 
             // Membuat data dummy
@@ -75,7 +77,7 @@ public class ProductActivity extends AppCompatActivity {
                 product.name = "Rawr";
                 product.price = 2000;
                 product.rating = 5;
-                product.category = "Cloth";
+                product.category = category.toLowerCase();
                 product.description = "Tidak ada";
 
                 db.productDao().insert(product);
@@ -95,7 +97,6 @@ public class ProductActivity extends AppCompatActivity {
         refresh_layout.setRefreshing(false);
     }
     // end
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +112,11 @@ public class ProductActivity extends AppCompatActivity {
 
         // Database
         db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
+        // end
+
+        // Preferences
+        preferences = getSharedPreferences("session", MODE_PRIVATE);
+        role = preferences.getString("role", "user");
         // end
 
         // Intent Data
@@ -132,10 +138,12 @@ public class ProductActivity extends AppCompatActivity {
 
         // Delete
         list_product.setOnItemLongClickListener((parent, view, position, id) -> {
+            if (!role.equals("admin")) return false;
+
             try {
-                int product_id = Integer.parseInt(((TextView) view.findViewById(R.id.product_id)).getText().toString());
+                String product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
                 execute(() -> {
-                    db.productDao().delete(product_id);
+                    db.productDao().delete(Integer.parseInt(product_id));
                     show_product();
                 });
 
@@ -146,34 +154,30 @@ public class ProductActivity extends AppCompatActivity {
             }
         });
 
-        // Update
         list_product.setOnItemClickListener((parent, view, position, id) -> {
-            product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
-            action = "update";
-
-            execute(() -> {
-                Product product = db.productDao().get(Integer.parseInt(product_id));
-
-                runOnUiThread(() -> {
-                    raw_product_name.setText(product.name);
-                    raw_product_price.setText(String.valueOf(product.price));
-                    raw_product_rating.setText(String.valueOf(product.rating));
-                    raw_product_description.setText(product.description);
-                    dialog.show();
-                });
-            });
+            if (role.equals("admin")) show_update_form(view);
+            else if (role.equals("user")) show_user_form(view);
         });
         // end
 
         // Product Dialog
-        dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_product_input);
-        dialog.findViewById(R.id.submit).setOnClickListener(v -> validate());
+        // Admin
+        admin_dialog = new Dialog(this);
+        admin_dialog.setContentView(R.layout.dialog_form_product);
+        admin_dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_admin_form());
+        ((TextView) admin_dialog.findViewById(R.id.dialog_title)).setText(category);
 
-        raw_product_name = dialog.findViewById(R.id.product_name);
-        raw_product_price = dialog.findViewById(R.id.product_price);
-        raw_product_rating = dialog.findViewById(R.id.product_rating);
-        raw_product_description = dialog.findViewById(R.id.product_description);
+        raw_product_name = admin_dialog.findViewById(R.id.product_name);
+        raw_product_price = admin_dialog.findViewById(R.id.product_price);
+        raw_product_rating = admin_dialog.findViewById(R.id.product_rating);
+        raw_product_description = admin_dialog.findViewById(R.id.product_description);
+
+        // User
+        user_dialog = new Dialog(this);
+        user_dialog.setContentView(R.layout.dialog_add_product_to_cart);
+        user_dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_user_form());
+
+        raw_product_amount = user_dialog.findViewById(R.id.product_amount);
         // end
 
         // SwipeRefresh
@@ -187,7 +191,54 @@ public class ProductActivity extends AppCompatActivity {
         execute(this::show_product);
     }
 
-    private void validate() {
+    private void show_user_form(@NonNull View view) {
+        user_dialog.show();
+        product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
+        String product_name = ((TextView) view.findViewById(R.id.product_name)).getText().toString();
+        ((TextView) user_dialog.findViewById(R.id.product_name)).setText(product_name);
+    }
+
+    private void show_update_form(@NonNull View view) {
+        product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
+        action = "update";
+
+        execute(() -> {
+            Product product = db.productDao().get(Integer.parseInt(product_id));
+
+            runOnUiThread(() -> {
+                raw_product_name.setText(product.name);
+                raw_product_price.setText(String.valueOf(product.price));
+                raw_product_rating.setText(String.valueOf(product.rating));
+                raw_product_description.setText(product.description);
+                admin_dialog.show();
+            });
+        });
+    }
+
+    private void handle_user_form() {
+        String amount = Objects.requireNonNull(raw_product_amount.getText()).toString().trim();
+        product_id = ((TextView) findViewById(R.id.product_id)).getText().toString();
+
+        if (amount.isEmpty()) {
+            raw_product_amount.setError("Amount cannot be empty");
+            return;
+        } else {
+            raw_product_amount.setError(null);
+        }
+
+        execute(() -> {
+            Cart cart = new Cart();
+            cart.product_id = Integer.parseInt(product_id);
+            cart.quantity = Integer.parseInt(amount);
+
+            db.cartDao().insert(cart);
+        });
+
+        toast(this, "Data berhasil ditambahkan");
+        user_dialog.dismiss();
+    }
+
+    private void handle_admin_form() {
         try {
             String product_name = Objects.requireNonNull(raw_product_name.getText()).toString().trim();
             String product_price = Objects.requireNonNull(raw_product_price.getText()).toString().trim();
@@ -234,7 +285,7 @@ public class ProductActivity extends AppCompatActivity {
                     break;
             }
 
-            dialog.dismiss();
+            admin_dialog.dismiss();
         } catch (Exception e) {
             toast(this, "Terjadi error pada validate", String.valueOf(e));
         } finally {

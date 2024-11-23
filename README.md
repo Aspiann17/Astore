@@ -29,3 +29,4 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - https://stackoverflow.com/questions/22617028/listview-hold-and-press-with-ontouchlistener
 - https://stackoverflow.com/questions/42276707/how-to-use-return-value-from-executorservice
 - https://stackoverflow.com/questions/16425146/runonuithread-in-fragment
+- https://developer.android.com/training/data-storage/shared-preferences?hl=id#java

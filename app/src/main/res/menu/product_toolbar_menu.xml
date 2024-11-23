@@ -10,8 +10,4 @@
         android:id="@+id/add_tmp_product"
         android:title="Add tmp product" />
 
-    <item
-        android:id="@+id/admin_mode"
-        android:enabled="true"
-        android:title="Admin Mode" />
 </menu>

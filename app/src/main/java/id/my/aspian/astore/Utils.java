@@ -20,10 +20,6 @@ public class Utils {
         }
     }
 
-    public static void toast(Context context) {
-        toast(context, "Test");
-    }
-
     public static String format(long number) {
         return formatter.format(number).replace(",00", "");
     }
