@@ -20,6 +20,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.room.Room;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -28,20 +29,17 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ProductActivity extends AppCompatActivity {
-    StoreDatabase db;
-
+    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description;
+    SwipeRefreshLayout refresh_layout;
+    ListView list_product;
     Dialog dialog;
 
-    ListView list_product;
-
+    StoreDatabase db;
     ArrayList<Map<String, String>> product_data;
-
     String category, action, product_id = null;
 
-    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description;
 
     // Toolbar
-
     // Back Button
     @Override
     public boolean onSupportNavigateUp() {
@@ -69,6 +67,8 @@ public class ProductActivity extends AppCompatActivity {
             action = "add";
             dialog.show();
         } else if (item_id == R.id.add_tmp_product) {
+
+            // Membuat data dummy
             execute(() -> {
                 Product product = new Product();
                 product.name = "Rawr";
@@ -83,6 +83,15 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+    // end
+
+    // SwipeRefresh
+    @Override
+    protected void onResume() {
+        super.onResume();
+        execute(this::show_product);
+        refresh_layout.setRefreshing(false);
     }
     // end
 
@@ -111,9 +120,7 @@ public class ProductActivity extends AppCompatActivity {
         // Toolbar
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) {
-            toolbar.setTitle(category);
-        }
+        if (toolbar != null) toolbar.setTitle(category);
         // end
 
         // List Product
@@ -141,11 +148,10 @@ public class ProductActivity extends AppCompatActivity {
         // Update
         list_product.setOnItemClickListener((parent, view, position, id) -> {
             product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
-
             action = "update";
 
             execute(() -> {
-                Product product = db.productDao().get(product_id);
+                Product product = db.productDao().get(Integer.parseInt(product_id));
 
                 runOnUiThread(() -> {
                     raw_product_name.setText(product.name);
@@ -158,14 +164,23 @@ public class ProductActivity extends AppCompatActivity {
         });
         // end
 
-        // Add Product Dialog
+        // Product Dialog
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_product_input);
         dialog.findViewById(R.id.submit).setOnClickListener(v -> validate());
+
         raw_product_name = dialog.findViewById(R.id.product_name);
         raw_product_price = dialog.findViewById(R.id.product_price);
         raw_product_rating = dialog.findViewById(R.id.product_rating);
         raw_product_description = dialog.findViewById(R.id.product_description);
+        // end
+
+        // SwipeRefresh
+        refresh_layout = findViewById(R.id.refresh_layout);
+        refresh_layout.setOnRefreshListener(() -> {
+            execute(this::show_product);
+            refresh_layout.setRefreshing(false);
+        });
         // end
 
         execute(this::show_product);
@@ -183,13 +198,19 @@ public class ProductActivity extends AppCompatActivity {
                 raw_product_name.setError("Name must be filled");
                 return;
             } else if (product_price.isEmpty()) {
+                raw_product_price.setError("Price cannot be empty");
                 return;
             } else if (product_rating.isEmpty()) {
+                raw_product_rating.setError("Rating cannot be empty");
                 return;
             } else if (product_description.isEmpty()) {
+                raw_product_description.setError("Description cannot be empty");
                 return;
             } else {
-                raw_product_name.setError(null);
+                for (TextInputEditText i : new TextInputEditText[]{
+                        raw_product_name, raw_product_price,
+                        raw_product_rating, raw_product_description
+                }) i.setError(null);
             }
 
             Product product = new Product();
@@ -213,7 +234,6 @@ public class ProductActivity extends AppCompatActivity {
             }
 
             dialog.dismiss();
-
         } catch (Exception e) {
             toast(this, "Terjadi error pada validate", String.valueOf(e));
         } finally {
