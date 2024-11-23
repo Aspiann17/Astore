@@ -4,8 +4,11 @@
     <item
         android:id="@+id/add_product"
         android:enabled="true"
-        android:title="Add Product"
-        android:titleTextColor="@color/primary" />
+        android:title="Add Product" />
+
+    <item
+        android:id="@+id/add_tmp_product"
+        android:title="Add tmp product" />
 
     <item
         android:id="@+id/admin_mode"

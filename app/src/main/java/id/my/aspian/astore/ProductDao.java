@@ -1,7 +1,6 @@
 package id.my.aspian.astore;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -15,10 +14,10 @@ public interface ProductDao {
     List<Product> getAll();
 
     @Query("SELECT * FROM products WHERE id = :id")
-    List<Product> get(int id);
+    Product get(String id);
 
-    @Query("SELECT * FROM products WHERE category = :category")
-    List<Product> get(String category);
+//    @Query("SELECT * FROM products WHERE category = :category")
+//    List<Product> get(String category);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Product product);
@@ -29,6 +28,6 @@ public interface ProductDao {
     @Update
     void update(Product product);
 
-    @Delete
-    void delete(Product product);
+    @Query("DELETE FROM products WHERE id = :id")
+    void delete(int id);
 }

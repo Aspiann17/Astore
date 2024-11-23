@@ -62,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
         });
         // end
 
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_product_input);
-        dialog.show();
+//        Dialog dialog = new Dialog(this);
+//        dialog.setContentView(R.layout.dialog_product_input);
+//        dialog.show();
 
 //        execute(() -> {
 //            Product product = new Product();

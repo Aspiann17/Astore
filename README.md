@@ -17,6 +17,14 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - [Tombol Aksi Mengambang](https://developer.android.com/develop/ui/views/components/floating-action-button?hl=id)
 - [Tab Layout](https://developer.android.com/reference/com/google/android/material/tabs/TabLayout)
 - [Bottom Navigation](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomNavigation.md)
-- [Toolbar Back Arrow](https://stackoverflow.com/questions/26651602/display-back-arrow-on-toolbar)
+
+## Back
 - [DAO](https://developer.android.com/training/data-storage/room?hl=id#java)
+- https://stackoverflow.com/questions/26651602/display-back-arrow-on-toolbar
+- https://stackoverflow.com/questions/48962106/add-unique-constraint-in-room-database-to-multiple-column
 - https://stackoverflow.com/questions/12483508/setemptyview-on-listview-not-showing-its-view-in-a-android-app
+- https://stackoverflow.com/questions/23720313/android-save-user-session
+- https://stackoverflow.com/questions/47905627/how-to-annotate-a-default-value-inside-a-android-room-entity
+- https://stackoverflow.com/questions/30953449/design-android-edittext-to-show-error-message-as-described-by-google
+- https://stackoverflow.com/questions/22617028/listview-hold-and-press-with-ontouchlistener
+- https://stackoverflow.com/questions/42276707/how-to-use-return-value-from-executorservice

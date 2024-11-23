@@ -1,8 +1,6 @@
 package id.my.aspian.astore;
 
 import static id.my.aspian.astore.Utils.execute;
-import static id.my.aspian.astore.Utils.format;
-import static id.my.aspian.astore.Utils.star;
 import static id.my.aspian.astore.Utils.toast;
 
 import android.app.Dialog;
@@ -11,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -22,13 +21,24 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.room.Room;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class ProductActivity extends AppCompatActivity {
     StoreDatabase db;
+
+    Dialog dialog;
+
+    ListView list_product;
+
+    ArrayList<Map<String, String>> product_data;
+
+    String category, action, product_id = null;
+
+    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description;
 
     // Toolbar
 
@@ -49,9 +59,27 @@ public class ProductActivity extends AppCompatActivity {
         int item_id = item.getItemId();
 
         if (item_id == R.id.add_product) {
-            Dialog dialog = new Dialog(ProductActivity.this);
-            dialog.setContentView(R.layout.dialog_product_input);
+
+            // Mengosongkan Input
+            for (TextInputEditText i : new TextInputEditText[]{
+                    raw_product_name, raw_product_price,
+                    raw_product_rating, raw_product_description
+            }) i.setText("");
+
+            action = "add";
             dialog.show();
+        } else if (item_id == R.id.add_tmp_product) {
+            execute(() -> {
+                Product product = new Product();
+                product.name = "Rawr";
+                product.price = 2000;
+                product.rating = 5;
+                product.category = "Cloth";
+                product.description = "Tidak ada";
+
+                db.productDao().insert(product);
+                show_product();
+            });
         }
 
         return false;
@@ -77,8 +105,6 @@ public class ProductActivity extends AppCompatActivity {
 
         // Intent Data
         Bundle intent_data = getIntent().getExtras();
-        String category = null;
-
         if (intent_data != null) category = intent_data.getString("category");
         // end
 
@@ -91,32 +117,121 @@ public class ProductActivity extends AppCompatActivity {
         // end
 
         // List Product
-        ListView list_product = findViewById(R.id.list_product);
+        list_product = findViewById(R.id.list_product);
         list_product.setEmptyView(findViewById(R.id.empty_product));
-        execute(() -> {
-            list_product.setAdapter(new SimpleAdapter(
-                    this, parse_data(), R.layout.list_products,
-                    new String[]{"product_name", "product_price", "product_rating", "product_category", "product_description"},
-                    new int[]{R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
-            ));
+
+        // Event
+
+        // Delete
+        list_product.setOnItemLongClickListener((parent, view, position, id) -> {
+            try {
+                int product_id = Integer.parseInt(((TextView) view.findViewById(R.id.product_id)).getText().toString());
+                execute(() -> {
+                    db.productDao().delete(product_id);
+                    show_product();
+                });
+
+                return true;
+            } catch (Exception e) {
+                toast(this, "Terjadi error pada bagian 'list_product.setOnItemLongClickListener'");
+                return false;
+            }
+        });
+
+        // Update
+        list_product.setOnItemClickListener((parent, view, position, id) -> {
+            product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
+
+            action = "update";
+
+            execute(() -> {
+                Product product = db.productDao().get(product_id);
+
+                runOnUiThread(() -> {
+                    raw_product_name.setText(product.name);
+                    raw_product_price.setText(String.valueOf(product.price));
+                    raw_product_rating.setText(String.valueOf(product.rating));
+                    raw_product_description.setText(product.description);
+                    dialog.show();
+                });
+            });
         });
         // end
+
+        // Add Product Dialog
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_product_input);
+        dialog.findViewById(R.id.submit).setOnClickListener(v -> validate());
+        raw_product_name = dialog.findViewById(R.id.product_name);
+        raw_product_price = dialog.findViewById(R.id.product_price);
+        raw_product_rating = dialog.findViewById(R.id.product_rating);
+        raw_product_description = dialog.findViewById(R.id.product_description);
+        // end
+
+        execute(this::show_product);
     }
 
-    private ArrayList<Map<String, String>> parse_data() {
-        ArrayList<Map<String, String>> list = new ArrayList<>();
+    private void validate() {
+        try {
+            String product_name = Objects.requireNonNull(raw_product_name.getText()).toString().trim();
+            String product_price = Objects.requireNonNull(raw_product_price.getText()).toString().trim();
+            String product_rating = Objects.requireNonNull(raw_product_rating.getText()).toString().trim();
+            String product_description = Objects.requireNonNull(raw_product_description.getText()).toString().trim();
 
-        for (Product product : db.productDao().getAll()) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("product_id", product.id + "");
-            map.put("product_name", product.name);
-            map.put("product_price", format(product.price));
-            map.put("product_rating", star(product.rating));
-            map.put("product_category", "" + product.rating);
-            map.put("product_description", product.description);
-            list.add(map);
+            // Validation
+            if (product_name.isEmpty()) {
+                raw_product_name.setError("Name must be filled");
+                return;
+            } else if (product_price.isEmpty()) {
+                return;
+            } else if (product_rating.isEmpty()) {
+                return;
+            } else if (product_description.isEmpty()) {
+                return;
+            } else {
+                raw_product_name.setError(null);
+            }
+
+            Product product = new Product();
+            product.name = product_name;
+            product.price = Integer.parseInt(product_price);
+            product.rating = Integer.parseInt(product_rating);
+            product.category = category.toLowerCase();
+            product.description = product_description;
+
+            switch (action) {
+                case "add":
+                    execute(() -> db.productDao().insert(product));
+                    break;
+                case "update":
+                    product.id = Integer.parseInt(product_id);
+                    execute(() -> db.productDao().update(product));
+                    break;
+                default:
+                    toast(this, "No Action");
+                    break;
+            }
+
+            dialog.dismiss();
+
+        } catch (Exception e) {
+            toast(this, "Terjadi error pada validate", String.valueOf(e));
+        } finally {
+            execute(this::show_product);
         }
+    }
 
-        return list;
+    private void show_product() {
+        product_data = Product.get_all(db);
+
+        if (product_data.isEmpty()) return;
+
+        runOnUiThread(() -> {
+            list_product.setAdapter(new SimpleAdapter(
+                    this, product_data, R.layout.list_products,
+                    new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
+                    new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
+            ));
+        });
     }
 }

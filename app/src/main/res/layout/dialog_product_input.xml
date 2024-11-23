@@ -33,6 +33,7 @@
             app:hintEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black" />
@@ -52,6 +53,7 @@
             app:prefixTextColor="@color/black">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -71,6 +73,7 @@
             app:suffixTextColor="@color/black">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_rating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -88,6 +91,7 @@
             app:hintEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_description"
                 android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,10 +120,11 @@
         <!--        </LinearLayout>-->
 
         <Button
+            android:id="@+id/submit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/primary"
-            android:text="Add"
+            android:text="Submit"
             android:textColor="@color/white" />
 
     </LinearLayout>

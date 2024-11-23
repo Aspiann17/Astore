@@ -1,8 +1,16 @@
 package id.my.aspian.astore;
 
+import static id.my.aspian.astore.Utils.format;
+import static id.my.aspian.astore.Utils.star;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity(tableName = "products")
 public class Product {
@@ -26,13 +34,21 @@ public class Product {
     @ColumnInfo(name = "description")
     public String description;
 
-    public Product(String name, int price, int rating, String category, String description) {
-        this.name = name;
-        this.price = price;
-        this.rating = rating;
-        this.category = category;
-        this.description = description;
-    }
+    public static ArrayList<Map<String, String>> get_all(StoreDatabase db) {
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+        List<Product> product_data = db.productDao().getAll();
 
-    public Product() {}
+        for (Product product : product_data) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("product_id", product.id + "");
+            map.put("product_name", product.name);
+            map.put("product_price", format(product.price));
+            map.put("product_rating", star(product.rating));
+            map.put("product_category", String.valueOf(product.rating));
+            map.put("product_description", product.description);
+            list.add(map);
+        }
+
+        return list;
+    }
 }
