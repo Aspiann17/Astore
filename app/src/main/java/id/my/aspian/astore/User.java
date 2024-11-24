@@ -1,6 +1,5 @@
 package id.my.aspian.astore;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -14,9 +13,6 @@ public class User {
 
     @ColumnInfo(name = "username")
     public String username;
-
-    @ColumnInfo(name = "hashword")
-    public String hashword;
 
     @ColumnInfo(name = "password")
     public String password;

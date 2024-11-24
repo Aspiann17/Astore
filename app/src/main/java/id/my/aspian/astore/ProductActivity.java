@@ -81,8 +81,9 @@ public class ProductActivity extends AppCompatActivity {
                 product.description = "Tidak ada";
 
                 db.productDao().insert(product);
-                show_product();
             });
+
+            refresh();
         }
 
         return false;
@@ -93,8 +94,7 @@ public class ProductActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        execute(this::show_product);
-        refresh_layout.setRefreshing(false);
+        refresh();
     }
     // end
     @Override
@@ -142,10 +142,8 @@ public class ProductActivity extends AppCompatActivity {
 
             try {
                 String product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
-                execute(() -> {
-                    db.productDao().delete(Integer.parseInt(product_id));
-                    show_product();
-                });
+                execute(() -> db.productDao().delete(Integer.parseInt(product_id)));
+                refresh();
 
                 return true;
             } catch (Exception e) {
@@ -182,13 +180,10 @@ public class ProductActivity extends AppCompatActivity {
 
         // SwipeRefresh
         refresh_layout = findViewById(R.id.refresh_layout);
-        refresh_layout.setOnRefreshListener(() -> {
-            execute(this::show_product);
-            refresh_layout.setRefreshing(false);
-        });
+        refresh_layout.setOnRefreshListener(this::refresh);
         // end
 
-        execute(this::show_product);
+        refresh();
     }
 
     private void show_user_form(@NonNull View view) {
@@ -289,7 +284,7 @@ public class ProductActivity extends AppCompatActivity {
         } catch (Exception e) {
             toast(this, "Terjadi error pada validate", String.valueOf(e));
         } finally {
-            execute(this::show_product);
+            refresh();
         }
     }
 
@@ -305,5 +300,11 @@ public class ProductActivity extends AppCompatActivity {
                 new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
             ));
         });
+    }
+
+    private void refresh() {
+        refresh_layout.setRefreshing(true);
+        execute(this::show_product);
+        refresh_layout.setRefreshing(false);
     }
 }

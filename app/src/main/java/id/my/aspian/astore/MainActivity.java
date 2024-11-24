@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
 
+    Menu bottom_menu;
+
     // Option
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
@@ -32,8 +34,14 @@ public class MainActivity extends AppCompatActivity {
         int item_id = item.getItemId();
         if (item_id == R.id.admin_mode) {
             editor.putString("role", "admin");
+            bottom_menu.findItem(R.id.nav_cart).setVisible(false);
+            bottom_menu.findItem(R.id.nav_order).setVisible(false);
+            bottom_menu.findItem(R.id.nav_profile).setVisible(false);
         } else if (item_id == R.id.user_mode) {
             editor.putString("role", "user");
+            bottom_menu.findItem(R.id.nav_cart).setVisible(true);
+            bottom_menu.findItem(R.id.nav_order).setVisible(true);
+            bottom_menu.findItem(R.id.nav_profile).setVisible(true);
         }
 
         editor.apply();
@@ -83,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+        bottom_menu = bottom_nav.getMenu();
         // end
 
         // Preferences

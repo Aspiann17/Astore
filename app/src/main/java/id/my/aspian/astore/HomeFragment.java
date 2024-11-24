@@ -62,8 +62,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        execute(this::show_card);
-        refresh_layout.setRefreshing(false);
+        refresh();
     }
 
     @Override
@@ -82,10 +81,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         refresh_layout = view.findViewById(R.id.refresh_layout);
-        refresh_layout.setOnRefreshListener(() -> {
-            execute(this::show_card);
-            refresh_layout.setRefreshing(false);
-        });
+        refresh_layout.setOnRefreshListener(this::refresh);
 
         list_category = view.findViewById(R.id.list_category);
         list_category.setEmptyView(view.findViewById(R.id.empty_category));
@@ -97,7 +93,7 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        execute(this::show_card);
+        refresh();
         return view;
     }
 
@@ -114,12 +110,20 @@ public class HomeFragment extends Fragment {
             list.add(map);
         }
 
-        requireActivity().runOnUiThread(() -> {
-            list_category.setAdapter(new SimpleAdapter(
-                getContext(), list, R.layout.list_category,
-                new String[]{"category_title", "category_count"},
-                new int[]{R.id.category_title, R.id.product_available}
-            ));
-        });
+        if (getActivity() != null) {
+            requireActivity().runOnUiThread(() -> {
+                list_category.setAdapter(new SimpleAdapter(
+                        getContext(), list, R.layout.list_category,
+                        new String[]{"category_title", "category_count"},
+                        new int[]{R.id.category_title, R.id.product_available}
+                ));
+            });
+        }
+    }
+
+    private void refresh() {
+        refresh_layout.setRefreshing(true);
+        execute(this::show_card);
+        refresh_layout.setRefreshing(false);
     }
 }
