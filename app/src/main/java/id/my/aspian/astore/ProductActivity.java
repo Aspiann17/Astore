@@ -27,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,7 +47,8 @@ public class ProductActivity extends AppCompatActivity {
     // Back Button
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+//        onBackPressed();
+        finish();
         return true;
     }
 
@@ -172,7 +174,7 @@ public class ProductActivity extends AppCompatActivity {
 
         // User
         user_dialog = new Dialog(this);
-        user_dialog.setContentView(R.layout.dialog_add_product_to_cart);
+        user_dialog.setContentView(R.layout.dialog_product_amount);
         user_dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_user_form());
 
         raw_product_amount = user_dialog.findViewById(R.id.product_amount);
@@ -222,14 +224,14 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         execute(() -> {
+            // db.cartDao().getAllProductId().contains(Integer.parseInt(product_id));
+
             Cart cart = new Cart();
             cart.product_id = Integer.parseInt(product_id);
             cart.quantity = Integer.parseInt(amount);
-
             db.cartDao().insert(cart);
         });
 
-        toast(this, "Data berhasil ditambahkan");
         user_dialog.dismiss();
     }
 

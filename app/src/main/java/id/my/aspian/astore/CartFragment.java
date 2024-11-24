@@ -1,12 +1,25 @@
 package id.my.aspian.astore;
 
+import static id.my.aspian.astore.Utils.execute;
+import static id.my.aspian.astore.Utils.format;
+import static id.my.aspian.astore.Utils.star;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +27,11 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class CartFragment extends Fragment {
+    StoreDatabase db;
+    ListView list_cart;
+    SwipeRefreshLayout refresh_layout;
+
+    ArrayList<Map<String, String>> product_data;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,9 +42,7 @@ public class CartFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public CartFragment() {
-        // Required empty public constructor
-    }
+    public CartFragment() {}
 
     /**
      * Use this factory method to create a new instance of
@@ -56,9 +72,32 @@ public class CartFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        db = Room.databaseBuilder(requireActivity(), StoreDatabase.class, "store").build();
+
+        View view = inflater.inflate(R.layout.fragment_cart, container, false);
+        list_cart = view.findViewById(R.id.list_cart);
+
+        refresh_layout = view.findViewById(R.id.refresh_layout);
+        refresh_layout.setOnRefreshListener(this::refresh);
+
+        execute(() -> {
+            ArrayList<Map<String, String>> list = Cart.get_all(db);
+
+            requireActivity().runOnUiThread(() -> {
+                list_cart.setAdapter(new SimpleAdapter(
+                        getContext(), list, R.layout.list_products,
+                        new String[]{"product_id", "product_name", "product_price", "product_amount", "total_price"},
+                        new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_description}
+                ));
+            });
+        });
+
+        return view;
+    }
+
+    private void refresh() {
+        refresh_layout.setRefreshing(true);
+        refresh_layout.setRefreshing(false);
     }
 }

@@ -17,6 +17,7 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - [Tombol Aksi Mengambang](https://developer.android.com/develop/ui/views/components/floating-action-button?hl=id)
 - [Tab Layout](https://developer.android.com/reference/com/google/android/material/tabs/TabLayout)
 - [Bottom Navigation](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomNavigation.md)
+- https://stackoverflow.com/questions/17495199/why-is-a-framelayout-used-for-fragments
 
 ## Back
 - [DAO](https://developer.android.com/training/data-storage/room?hl=id#java)
@@ -30,3 +31,4 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - https://stackoverflow.com/questions/42276707/how-to-use-return-value-from-executorservice
 - https://stackoverflow.com/questions/16425146/runonuithread-in-fragment
 - https://developer.android.com/training/data-storage/shared-preferences?hl=id#java
+- https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
