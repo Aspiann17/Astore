@@ -222,9 +222,16 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         execute(() -> {
-            // db.cartDao().getAllProductId().contains(Integer.parseInt(product_id));
-
             Cart cart = new Cart();
+            List<Integer> product_id_list = db.cartDao().getAllProductId();
+
+            if (product_id_list.contains(Integer.parseInt(product_id))) {
+                cart = db.cartDao().get(Integer.parseInt(product_id));
+                cart.quantity += Integer.parseInt(amount);
+                db.cartDao().update(cart);
+                return;
+            }
+
             cart.product_id = Integer.parseInt(product_id);
             cart.quantity = Integer.parseInt(amount);
             db.cartDao().insert(cart);
