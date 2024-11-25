@@ -28,7 +28,7 @@ public interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserts(Product... products);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(Product product);
 
     @Query("DELETE FROM products WHERE id = :id")

@@ -257,6 +257,12 @@ public class ProductActivity extends AppCompatActivity {
             } else if (product_rating.isEmpty()) {
                 raw_product_rating.setError("Rating cannot be empty");
                 return;
+            } else if (
+                Integer.parseInt(product_rating) > 5 ||
+                Integer.parseInt(product_rating) < 1
+            ) {
+                raw_product_rating.setError("Rating must be 1-5");
+                return;
             } else if (product_description.isEmpty()) {
                 raw_product_description.setError("Description cannot be empty");
                 return;
@@ -295,23 +301,24 @@ public class ProductActivity extends AppCompatActivity {
         }
     }
 
-    private void show_product() {
-        product_data = Product.get_all(db, category.toLowerCase());
-
-        if (product_data.isEmpty()) return;
-
-        runOnUiThread(() -> {
-            list_product.setAdapter(new SimpleAdapter(
-                this, product_data, R.layout.list_products,
-                new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
-                new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
-            ));
-        });
-    }
-
     private void refresh() {
         refresh_layout.setRefreshing(true);
-        execute(this::show_product);
-        refresh_layout.setRefreshing(false);
+
+        execute(() -> {
+            product_data = Product.get_all(db, category.toLowerCase());
+
+            if (product_data.isEmpty()) return;
+
+            runOnUiThread(() -> {
+                list_product.setAdapter(new SimpleAdapter(
+                    this, product_data, R.layout.list_products,
+                    new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
+                    new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
+                ));
+
+                refresh_layout.setRefreshing(false);
+
+            });
+        });
     }
 }

@@ -2,8 +2,9 @@ package id.my.aspian.astore;
 
 import static id.my.aspian.astore.Utils.execute;
 import static id.my.aspian.astore.Utils.format;
-import static id.my.aspian.astore.Utils.star;
+import static id.my.aspian.astore.Utils.toast;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,10 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,10 +30,13 @@ import java.util.Map;
  */
 public class CartFragment extends Fragment {
     StoreDatabase db;
+    View view;
     ListView list_cart;
     SwipeRefreshLayout refresh_layout;
+    Dialog dialog;
+    TextInputEditText dialog_input;
 
-    ArrayList<Map<String, String>> product_data;
+    String cart_id, product_id;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -74,30 +79,77 @@ public class CartFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         db = Room.databaseBuilder(requireActivity(), StoreDatabase.class, "store").build();
+        view = inflater.inflate(R.layout.fragment_cart, container, false);
+        dialog = new Dialog(requireContext());
+        dialog.setContentView(R.layout.dialog_product_amount);
+        dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_modify_amount());
+        dialog_input = dialog.findViewById(R.id.product_amount);
+        TextView dialog_title = dialog.findViewById(R.id.product_name);
 
-        View view = inflater.inflate(R.layout.fragment_cart, container, false);
         list_cart = view.findViewById(R.id.list_cart);
+        list_cart.setOnItemLongClickListener((parent, v, position, id) -> {
+            String cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
+            execute(() -> db.cartDao().delete(Integer.parseInt(cart_id)));
+
+            refresh();
+            return true;
+        });
+
+        // Update
+        list_cart.setOnItemClickListener((parent, v, position, id) -> {
+            String product_name = ((TextView) v.findViewById(R.id.product_name)).getText().toString();
+            cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
+            product_id = ((TextView) v.findViewById(R.id.product_id)).getText().toString();
+            toast(getContext(), product_id);
+            dialog_title.setText(product_name);
+            dialog.show();
+        });
 
         refresh_layout = view.findViewById(R.id.refresh_layout);
         refresh_layout.setOnRefreshListener(this::refresh);
 
-        execute(() -> {
-            ArrayList<Map<String, String>> list = Cart.get_all(db);
+        refresh();
+        return view;
+    }
 
-            requireActivity().runOnUiThread(() -> {
-                list_cart.setAdapter(new SimpleAdapter(
-                        getContext(), list, R.layout.list_products,
-                        new String[]{"product_id", "product_name", "product_price", "product_amount", "total_price"},
-                        new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_description}
-                ));
-            });
+    private void handle_modify_amount() {
+        String amount = ((TextView) dialog.findViewById(R.id.product_amount)).getText().toString().trim();
+
+        if (amount.isEmpty()) {
+            dialog_input.setError("Amount cannot be empty");
+            return;
+        } else {
+            dialog_input.setError(null);
+        }
+
+        execute(() -> {
+            Cart cart = new Cart();
+            cart.id = Integer.parseInt(cart_id);
+            cart.product_id = Integer.parseInt(product_id);
+            cart.quantity = Integer.parseInt(amount);
+            db.cartDao().update(cart);
         });
 
-        return view;
+        dialog.dismiss();
     }
 
     private void refresh() {
         refresh_layout.setRefreshing(true);
-        refresh_layout.setRefreshing(false);
+
+        execute(() -> {
+            ArrayList<Map<String, String>> list = Cart.get_all(db);
+            long total_price = Cart.get_total(db);
+
+            requireActivity().runOnUiThread(() -> {
+                list_cart.setAdapter(new SimpleAdapter(
+                    getContext(), list, R.layout.list_products,
+                    new String[]{"cart_id", "product_id", "product_name", "product_price", "product_amount", "total_price"},
+                    new int[]{R.id.product_category, R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_description}
+                ));
+
+                ((TextView) view.findViewById(R.id.total_price)).setText(format(total_price));
+                refresh_layout.setRefreshing(false);
+            });
+        });
     }
 }

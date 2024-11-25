@@ -46,6 +46,7 @@ public class Cart {
 
             list.add(new HashMap<>() {{
                 put("cart_id", String.valueOf(cart.id));
+                put("product_id", String.valueOf(product.id));
                 put("product_name", product.name);
                 put("product_price", format(product.price));
                 put("product_amount", String.valueOf(cart.quantity));
@@ -54,5 +55,16 @@ public class Cart {
         }
 
         return list;
+    }
+
+    public static long get_total(StoreDatabase db) {
+        long total = 0;
+
+        for (Cart cart : db.cartDao().getAll()) {
+            Product product = db.productDao().get(cart.product_id);
+            total += ((long) cart.quantity * product.price);
+        }
+
+        return total;
     }
 }

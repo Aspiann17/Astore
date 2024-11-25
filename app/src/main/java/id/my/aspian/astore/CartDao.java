@@ -2,6 +2,7 @@ package id.my.aspian.astore;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -21,8 +22,11 @@ public interface CartDao {
     @Insert
     void insert(Cart cart);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(Cart cart);
+
+    @Query("DELETE FROM carts WHERE id = :cart_id")
+    void delete(int cart_id);
 
     @Query("DELETE FROM carts")
     void delete_all();
