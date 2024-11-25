@@ -188,7 +188,7 @@ public class CartFragment extends Fragment {
 
             requireActivity().runOnUiThread(() -> {
                 list_cart.setAdapter(new SimpleAdapter(
-                    getContext(), list, R.layout.list_products,
+                    requireContext(), list, R.layout.list_products,
                     new String[]{"cart_id", "product_id", "product_name", "product_price", "product_amount", "total_price"},
                     new int[]{R.id.product_category, R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_description}
                 ));

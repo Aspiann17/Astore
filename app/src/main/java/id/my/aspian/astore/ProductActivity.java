@@ -93,8 +93,11 @@ public class ProductActivity extends AppCompatActivity {
 
             refresh();
         } else if (item_id == R.id.to_cart) {
+            // Menuju ke MainActivity sambil menghapus semua Activity di BackStack
+            // dan langsung menampilkan CartFragment dengan menggunakan setSelectedItemId.
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("action", "cart");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 

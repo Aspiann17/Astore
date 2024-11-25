@@ -17,6 +17,8 @@ import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     StoreDatabase db;
     SharedPreferences preferences;
@@ -66,10 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
         db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
 
-        // Fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
-        // end
-
         // Navigation
         BottomNavigationView bottom_nav = findViewById(R.id.bottom_navigation);
         bottom_nav.setOnItemSelectedListener(item -> {
@@ -91,12 +89,24 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+
         bottom_menu = bottom_nav.getMenu();
         // end
 
         // Preferences
         preferences = getSharedPreferences("session", MODE_PRIVATE);
         editor = preferences.edit();
+        // end
+
+        // Handle Intent Data
+        Bundle intent_data = getIntent().getExtras();
+        if (
+            intent_data != null &&
+            intent_data.containsKey("action") &&
+            Objects.equals(intent_data.getString("action"), "cart")
+        ) bottom_nav.setSelectedItemId(R.id.nav_cart);
+
+        else move_fragment(new HomeFragment());
         // end
     }
 

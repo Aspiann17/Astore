@@ -33,3 +33,4 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - https://developer.android.com/training/data-storage/shared-preferences?hl=id#java
 - https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
 - https://developer.android.com/guide/fragments/appbar?hl=id#java
+- https://stackoverflow.com/questions/40202294/set-selected-item-in-android-bottomnavigationview
