@@ -47,7 +47,6 @@ public class ProductActivity extends AppCompatActivity {
     // Back Button
     @Override
     public boolean onSupportNavigateUp() {
-//        onBackPressed();
         finish();
         return true;
     }
@@ -189,10 +188,10 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     private void show_user_form(@NonNull View view) {
-        user_dialog.show();
         product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
         String product_name = ((TextView) view.findViewById(R.id.product_name)).getText().toString();
         ((TextView) user_dialog.findViewById(R.id.product_name)).setText(product_name);
+        user_dialog.show();
     }
 
     private void show_update_form(@NonNull View view) {
@@ -214,7 +213,6 @@ public class ProductActivity extends AppCompatActivity {
 
     private void handle_user_form() {
         String amount = Objects.requireNonNull(raw_product_amount.getText()).toString().trim();
-        product_id = ((TextView) findViewById(R.id.product_id)).getText().toString();
 
         if (amount.isEmpty()) {
             raw_product_amount.setError("Amount cannot be empty");

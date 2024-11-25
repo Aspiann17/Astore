@@ -101,8 +101,6 @@ public class MainActivity extends AppCompatActivity {
         // Preferences
         preferences = getSharedPreferences("session", MODE_PRIVATE);
         editor = preferences.edit();
-
-        toast(this, preferences.getString("role", "guess"));
         // end
     }
 }
