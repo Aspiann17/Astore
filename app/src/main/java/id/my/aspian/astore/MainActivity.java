@@ -1,8 +1,5 @@
 package id.my.aspian.astore;
 
-import static id.my.aspian.astore.Utils.execute;
-import static id.my.aspian.astore.Utils.toast;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,8 +25,10 @@ public class MainActivity extends AppCompatActivity {
     Menu bottom_menu;
 
     // Option
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
+        menu.findItem(R.id.delete_cart_data).setVisible(false);
         return true;
     }
 
@@ -37,20 +37,16 @@ public class MainActivity extends AppCompatActivity {
         if (item_id == R.id.admin_mode) {
             editor.putString("role", "admin");
             bottom_menu.findItem(R.id.nav_cart).setVisible(false);
-            // bottom_menu.findItem(R.id.nav_order).setVisible(false);
             bottom_menu.findItem(R.id.nav_profile).setVisible(false);
         } else if (item_id == R.id.user_mode) {
             editor.putString("role", "user");
             bottom_menu.findItem(R.id.nav_cart).setVisible(true);
-//            bottom_menu.findItem(R.id.nav_order).setVisible(true);
             bottom_menu.findItem(R.id.nav_profile).setVisible(true);
-        } else if (item_id == R.id.delete_cart_data) {
-            execute(() -> db.cartDao().delete_all());
         }
 
         editor.apply();
 
-        return true;
+        return super.onOptionsItemSelected(item);
     }
     // end
 
@@ -74,22 +70,22 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
         // end
 
-        // Bottom Navigation
+        // Navigation
         BottomNavigationView bottom_nav = findViewById(R.id.bottom_navigation);
         bottom_nav.setOnItemSelectedListener(item -> {
+
             int item_id = item.getItemId();
 
             if (item_id == R.id.nav_home) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment()).commit();
+                move_fragment(new HomeFragment());
                 return true;
             } else if (item_id == R.id.nav_cart) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new CartFragment()).commit();
+                move_fragment(new CartFragment());
                 return true;
-            } else if (item_id == R.id.nav_order) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new OrderFragment()).commit();
-                return true;
+            } else if (item_id == R.id.nav_list_all) {
+                return false;
             } else if (item_id == R.id.nav_profile) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new ProfileFragment()).commit();
+                move_fragment(new ProfileFragment());
                 return true;
             }
 
@@ -102,5 +98,9 @@ public class MainActivity extends AppCompatActivity {
         preferences = getSharedPreferences("session", MODE_PRIVATE);
         editor = preferences.edit();
         // end
+    }
+
+    private void move_fragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, fragment).commit();
     }
 }

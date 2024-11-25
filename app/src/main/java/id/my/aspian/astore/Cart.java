@@ -62,7 +62,7 @@ public class Cart {
 
         for (Cart cart : db.cartDao().getAll()) {
             Product product = db.productDao().get(cart.product_id);
-            total += ((long) cart.quantity * product.price);
+            total += (long) cart.quantity * product.price;
         }
 
         return total;

@@ -96,8 +96,6 @@ public class HomeFragment extends Fragment {
         };
 
         for (String category : categories) {
-//            db.productDao().count(category.toLowerCase());
-
             list.add(new HashMap<>() {{
                 put("category_title", category);
                 put("category_count", String.valueOf(db.productDao().count(category.toLowerCase())));

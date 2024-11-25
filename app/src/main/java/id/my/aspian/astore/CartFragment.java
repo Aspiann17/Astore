@@ -7,11 +7,15 @@ import static id.my.aspian.astore.Utils.toast;
 import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -32,9 +36,10 @@ public class CartFragment extends Fragment {
     StoreDatabase db;
     View view;
     ListView list_cart;
+    TextInputEditText dialog_input;
     SwipeRefreshLayout refresh_layout;
     Dialog dialog;
-    TextInputEditText dialog_input;
+    Menu toolbar_menu;
 
     String cart_id, product_id;
 
@@ -73,6 +78,47 @@ public class CartFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.main_toolbar_menu, menu);
+
+        toolbar_menu = menu;
+
+        // Menghilangkan option menu agar tidak duplikat
+        menu.findItem(R.id.user_mode).setVisible(false);
+        menu.findItem(R.id.admin_mode).setVisible(false);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.delete_cart_data) {
+            execute(() -> db.cartDao().delete_all());
+            refresh();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (toolbar_menu != null) {
+            toolbar_menu.findItem(R.id.delete_cart_data).setVisible(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (toolbar_menu != null) {
+            toolbar_menu.findItem(R.id.delete_cart_data).setVisible(true);
         }
     }
 

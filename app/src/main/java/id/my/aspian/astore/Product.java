@@ -39,14 +39,14 @@ public class Product {
         List<Product> product_data = db.productDao().getAll();
 
         for (Product product : product_data) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("product_id", product.id + "");
-            map.put("product_name", product.name);
-            map.put("product_price", format(product.price));
-            map.put("product_rating", star(product.rating));
-            map.put("product_category", String.valueOf(product.rating));
-            map.put("product_description", product.description);
-            list.add(map);
+            list.add(new HashMap<>() {{
+                put("product_id", product.id + "");
+                put("product_name", product.name);
+                put("product_price", format(product.price));
+                put("product_rating", star(product.rating));
+                put("product_category", String.valueOf(product.rating));
+                put("product_description", product.description);
+            }});
         }
 
         return list;

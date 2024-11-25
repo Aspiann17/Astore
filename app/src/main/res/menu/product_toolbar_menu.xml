@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/add_product"
@@ -9,5 +10,11 @@
     <item
         android:id="@+id/add_tmp_product"
         android:title="Add tmp product" />
+
+    <item
+        android:id="@+id/to_cart"
+        android:icon="@drawable/ic_cart_white"
+        android:title="Keranjang"
+        app:showAsAction="ifRoom" />
 
 </menu>

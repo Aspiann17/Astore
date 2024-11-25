@@ -4,6 +4,7 @@ import static id.my.aspian.astore.Utils.execute;
 import static id.my.aspian.astore.Utils.toast;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -53,7 +54,13 @@ public class ProductActivity extends AppCompatActivity {
 
     // Option
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (role.equals("admin")) getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.product_toolbar_menu, menu);
+
+        boolean is_admin = role.equals("admin");
+        menu.findItem(R.id.add_product).setVisible(is_admin);
+        menu.findItem(R.id.add_tmp_product).setVisible(is_admin);
+        menu.findItem(R.id.to_cart).setVisible(!is_admin);
+
         return true;
     }
 
@@ -85,9 +92,13 @@ public class ProductActivity extends AppCompatActivity {
             });
 
             refresh();
+        } else if (item_id == R.id.to_cart) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("action", "cart");
+            startActivity(intent);
         }
 
-        return false;
+        return super.onOptionsItemSelected(item);
     }
     // end
 
@@ -98,6 +109,7 @@ public class ProductActivity extends AppCompatActivity {
         refresh();
     }
     // end
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -307,8 +319,6 @@ public class ProductActivity extends AppCompatActivity {
         execute(() -> {
             product_data = Product.get_all(db, category.toLowerCase());
 
-            if (product_data.isEmpty()) return;
-
             runOnUiThread(() -> {
                 list_product.setAdapter(new SimpleAdapter(
                     this, product_data, R.layout.list_products,
@@ -317,7 +327,6 @@ public class ProductActivity extends AppCompatActivity {
                 ));
 
                 refresh_layout.setRefreshing(false);
-
             });
         });
     }
