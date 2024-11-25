@@ -27,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,7 +47,7 @@ public class ProductActivity extends AppCompatActivity {
     // Back Button
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+        finish();
         return true;
     }
 
@@ -172,7 +173,7 @@ public class ProductActivity extends AppCompatActivity {
 
         // User
         user_dialog = new Dialog(this);
-        user_dialog.setContentView(R.layout.dialog_add_product_to_cart);
+        user_dialog.setContentView(R.layout.dialog_product_amount);
         user_dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_user_form());
 
         raw_product_amount = user_dialog.findViewById(R.id.product_amount);
@@ -187,10 +188,10 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     private void show_user_form(@NonNull View view) {
-        user_dialog.show();
         product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
         String product_name = ((TextView) view.findViewById(R.id.product_name)).getText().toString();
         ((TextView) user_dialog.findViewById(R.id.product_name)).setText(product_name);
+        user_dialog.show();
     }
 
     private void show_update_form(@NonNull View view) {
@@ -212,7 +213,6 @@ public class ProductActivity extends AppCompatActivity {
 
     private void handle_user_form() {
         String amount = Objects.requireNonNull(raw_product_amount.getText()).toString().trim();
-        product_id = ((TextView) findViewById(R.id.product_id)).getText().toString();
 
         if (amount.isEmpty()) {
             raw_product_amount.setError("Amount cannot be empty");
@@ -223,13 +223,20 @@ public class ProductActivity extends AppCompatActivity {
 
         execute(() -> {
             Cart cart = new Cart();
+            List<Integer> product_id_list = db.cartDao().getAllProductId();
+
+            if (product_id_list.contains(Integer.parseInt(product_id))) {
+                cart = db.cartDao().get(Integer.parseInt(product_id));
+                cart.quantity += Integer.parseInt(amount);
+                db.cartDao().update(cart);
+                return;
+            }
+
             cart.product_id = Integer.parseInt(product_id);
             cart.quantity = Integer.parseInt(amount);
-
             db.cartDao().insert(cart);
         });
 
-        toast(this, "Data berhasil ditambahkan");
         user_dialog.dismiss();
     }
 

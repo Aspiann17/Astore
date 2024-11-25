@@ -7,6 +7,9 @@
 
     <item
         android:id="@+id/user_mode"
-        android:enabled="true"
         android:title="User Mode" />
+
+    <item
+        android:id="@+id/delete_cart_data"
+        android:title="Delete All Cart Data" />
 </menu>

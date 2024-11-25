@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,24 +99,27 @@ public class HomeFragment extends Fragment {
     private void show_card() {
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         String[] category = new String[]{
-                "Foods", "Drinks", "Cloth", "Electronic"
+            "Foods", "Drinks", "Cloth", "Electronic"
         };
 
         for (String c : category) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("category_title", c);
-            map.put("category_count", String.valueOf(db.productDao().count(c.toLowerCase())));
-            list.add(map);
+            list.add(new HashMap<>() {{
+                put("category_title", c);
+                put("category_count", String.valueOf(db.productDao().count(c.toLowerCase())));
+            }});
+
+            // list.add((HashMap<String, String>) Map.ofEntries(
+            //     Map.entry("category_title", c),
+            // Map.entry("category_count", String.valueOf(db.productDao().count(c.toLowerCase())))
+            // ));
         }
 
         if (getActivity() != null) {
-            requireActivity().runOnUiThread(() -> {
-                list_category.setAdapter(new SimpleAdapter(
-                        getContext(), list, R.layout.list_category,
-                        new String[]{"category_title", "category_count"},
-                        new int[]{R.id.category_title, R.id.product_available}
-                ));
-            });
+            requireActivity().runOnUiThread(() -> list_category.setAdapter(new SimpleAdapter(
+                getContext(), list, R.layout.list_category,
+                new String[]{"category_title", "category_count"},
+                new int[]{R.id.category_title, R.id.product_available}
+            )));
         }
     }
 

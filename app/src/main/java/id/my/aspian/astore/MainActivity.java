@@ -1,6 +1,8 @@
 package id.my.aspian.astore;
 
-import android.app.Dialog;
+import static id.my.aspian.astore.Utils.execute;
+import static id.my.aspian.astore.Utils.toast;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,13 +37,15 @@ public class MainActivity extends AppCompatActivity {
         if (item_id == R.id.admin_mode) {
             editor.putString("role", "admin");
             bottom_menu.findItem(R.id.nav_cart).setVisible(false);
-            bottom_menu.findItem(R.id.nav_order).setVisible(false);
+            // bottom_menu.findItem(R.id.nav_order).setVisible(false);
             bottom_menu.findItem(R.id.nav_profile).setVisible(false);
         } else if (item_id == R.id.user_mode) {
             editor.putString("role", "user");
             bottom_menu.findItem(R.id.nav_cart).setVisible(true);
-            bottom_menu.findItem(R.id.nav_order).setVisible(true);
+//            bottom_menu.findItem(R.id.nav_order).setVisible(true);
             bottom_menu.findItem(R.id.nav_profile).setVisible(true);
+        } else if (item_id == R.id.delete_cart_data) {
+            execute(() -> db.cartDao().delete_all());
         }
 
         editor.apply();
