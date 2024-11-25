@@ -146,7 +146,6 @@ public class CartFragment extends Fragment {
             String product_name = ((TextView) v.findViewById(R.id.product_name)).getText().toString();
             cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
             product_id = ((TextView) v.findViewById(R.id.product_id)).getText().toString();
-            toast(getContext(), product_id);
             dialog_title.setText(product_name);
             dialog.show();
         });
