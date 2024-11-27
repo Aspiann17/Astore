@@ -28,6 +28,9 @@ public interface CartDao {
     @Query("DELETE FROM carts WHERE id = :cart_id")
     void delete(int cart_id);
 
+    @Query("DELETE FROM carts WHERE id = :cart_id")
+    void delete(String cart_id);
+
     @Query("DELETE FROM carts")
     void delete_all();
 }

@@ -39,7 +39,7 @@ public class CartFragment extends Fragment {
     ListView list_cart;
     TextInputEditText dialog_input;
     SwipeRefreshLayout refresh_layout;
-    Dialog dialog;
+    Dialog amount_dialog, checkout_dialog;
     Menu toolbar_menu;
 
     String cart_id, product_id;
@@ -126,18 +126,32 @@ public class CartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         db = Room.databaseBuilder(requireActivity(), StoreDatabase.class, "store").build();
         view = inflater.inflate(R.layout.fragment_cart, container, false);
-        dialog = new Dialog(requireContext());
-        dialog.setContentView(R.layout.dialog_product_amount);
-        dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_modify_amount());
-        dialog_input = dialog.findViewById(R.id.product_amount);
-        TextInputLayout dialog_input_container = dialog.findViewById(R.id.input_container);
-        TextView dialog_title = dialog.findViewById(R.id.product_name);
 
+        // Dialog
+        amount_dialog = new Dialog(requireContext());
+        amount_dialog.setContentView(R.layout.dialog_product_amount);
+        amount_dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_modify_amount());
+        dialog_input = amount_dialog.findViewById(R.id.product_amount);
+        TextInputLayout dialog_input_container = amount_dialog.findViewById(R.id.input_container);
+        TextView dialog_title = amount_dialog.findViewById(R.id.product_name);
+
+        checkout_dialog = new Dialog(requireContext());
+        checkout_dialog.setContentView(R.layout.dialog_checkout);
+        checkout_dialog.findViewById(R.id.close_button).setOnClickListener(v -> {
+            checkout_dialog.dismiss();
+        });
+
+        checkout_dialog.findViewById(R.id.close_button).setOnClickListener(v -> {
+            db.cartDao().delete_all();
+            checkout_dialog.dismiss();
+        });
+
+        // List
         list_cart = view.findViewById(R.id.list_cart);
         list_cart.setEmptyView(view.findViewById(R.id.empty_list));
         list_cart.setOnItemLongClickListener((parent, v, position, id) -> {
             String cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
-            execute(() -> db.cartDao().delete(Integer.parseInt(cart_id)));
+            execute(() -> db.cartDao().delete(cart_id));
 
             refresh();
             return true;
@@ -149,7 +163,7 @@ public class CartFragment extends Fragment {
             cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
             product_id = ((TextView) v.findViewById(R.id.product_id)).getText().toString();
             dialog_title.setText(product_name);
-            dialog.show();
+            amount_dialog.show();
 
             execute(() -> {
                 int stock = db.productDao().get(Integer.parseInt(product_id)).stock;
@@ -160,12 +174,14 @@ public class CartFragment extends Fragment {
         refresh_layout = view.findViewById(R.id.refresh_layout);
         refresh_layout.setOnRefreshListener(this::refresh);
 
+        view.findViewById(R.id.checkout_button).setOnClickListener(v -> checkout_dialog.show());
+
         refresh();
         return view;
     }
 
     private void handle_modify_amount() {
-        String amount = ((TextView) dialog.findViewById(R.id.product_amount)).getText().toString().trim();
+        String amount = ((TextView) amount_dialog.findViewById(R.id.product_amount)).getText().toString().trim();
 
         if (amount.isEmpty()) {
             dialog_input.setError("Amount cannot be empty");
@@ -191,7 +207,7 @@ public class CartFragment extends Fragment {
             db.cartDao().update(cart);
         });
 
-        dialog.dismiss();
+        amount_dialog.dismiss();
     }
 
     private void refresh() {
@@ -202,6 +218,7 @@ public class CartFragment extends Fragment {
             long total_price = Cart.get_total(db);
 
             if (list.isEmpty()) {
+                list_cart.setAdapter(null);
                 refresh_layout.setRefreshing(false);
                 return;
             }
