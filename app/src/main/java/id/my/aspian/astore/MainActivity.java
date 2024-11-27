@@ -13,19 +13,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.Objects;
-
 public class MainActivity extends AppCompatActivity {
-    StoreDatabase db;
-    SharedPreferences preferences;
-    SharedPreferences.Editor editor;
+    private StoreDatabase db;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
 
-    Menu bottom_menu;
-    BottomNavigationView bottom_nav;
+    private Menu bottom_menu;
+    private BottomNavigationView bottom_nav;
 
     // Option
     @Override
@@ -36,19 +33,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int item_id = item.getItemId();
-        if (item_id == R.id.admin_mode) {
-            editor.putString("role", "admin");
-            bottom_nav.setSelectedItemId(R.id.nav_home);
-            bottom_menu.findItem(R.id.nav_cart).setVisible(false);
-            bottom_menu.findItem(R.id.nav_profile).setVisible(false);
-        } else if (item_id == R.id.user_mode) {
-            editor.putString("role", "user");
-            bottom_nav.setSelectedItemId(R.id.nav_home);
-            bottom_menu.findItem(R.id.nav_cart).setVisible(true);
-            bottom_menu.findItem(R.id.nav_profile).setVisible(true);
-        }
 
+        int item_id = item.getItemId();
+        boolean is_admin = item_id == R.id.admin_mode;
+
+//        bottom_nav.setVisibility(is_admin ? View.GONE : View.VISIBLE);
+        bottom_nav.setSelectedItemId(R.id.nav_home);
+        bottom_menu.findItem(R.id.nav_cart).setVisible(!is_admin);
+
+        editor.putString("role", is_admin ? "admin" : "user");
         editor.apply();
 
         return super.onOptionsItemSelected(item);
@@ -69,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
+//        db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
 
         // Navigation
         bottom_nav = findViewById(R.id.bottom_navigation);
@@ -82,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (item_id == R.id.nav_cart) {
                 move_fragment(new CartFragment());
-                return true;
-            } else if (item_id == R.id.nav_list_all) {
-                return false;
-            } else if (item_id == R.id.nav_profile) {
-                move_fragment(new ProfileFragment());
                 return true;
             }
 

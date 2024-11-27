@@ -23,6 +23,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -95,7 +96,6 @@ public class CartFragment extends Fragment {
         menu.findItem(R.id.admin_mode).setVisible(false);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.delete_cart_data) {
@@ -130,9 +130,11 @@ public class CartFragment extends Fragment {
         dialog.setContentView(R.layout.dialog_product_amount);
         dialog.findViewById(R.id.submit).setOnClickListener(v -> handle_modify_amount());
         dialog_input = dialog.findViewById(R.id.product_amount);
+        TextInputLayout dialog_input_container = dialog.findViewById(R.id.input_container);
         TextView dialog_title = dialog.findViewById(R.id.product_name);
 
         list_cart = view.findViewById(R.id.list_cart);
+        list_cart.setEmptyView(view.findViewById(R.id.empty_list));
         list_cart.setOnItemLongClickListener((parent, v, position, id) -> {
             String cart_id = ((TextView) v.findViewById(R.id.product_category)).getText().toString();
             execute(() -> db.cartDao().delete(Integer.parseInt(cart_id)));
@@ -148,6 +150,11 @@ public class CartFragment extends Fragment {
             product_id = ((TextView) v.findViewById(R.id.product_id)).getText().toString();
             dialog_title.setText(product_name);
             dialog.show();
+
+            execute(() -> {
+                int stock = db.productDao().get(Integer.parseInt(product_id)).stock;
+                dialog_input_container.setSuffixText("(" + stock + " pcs)");
+            });
         });
 
         refresh_layout = view.findViewById(R.id.refresh_layout);
@@ -163,11 +170,20 @@ public class CartFragment extends Fragment {
         if (amount.isEmpty()) {
             dialog_input.setError("Amount cannot be empty");
             return;
-        } else {
-            dialog_input.setError(null);
-        }
+        } else dialog_input.setError(null);
 
         execute(() -> {
+            int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
+
+            if (product_stock < Integer.parseInt(amount)) {
+                requireActivity().runOnUiThread(() -> {
+                    toast(getContext(), "Not enough stock");
+                    dialog_input.setError("Not enough stock");
+                });
+
+                return;
+            }
+
             Cart cart = new Cart();
             cart.id = Integer.parseInt(cart_id);
             cart.product_id = Integer.parseInt(product_id);
@@ -185,11 +201,16 @@ public class CartFragment extends Fragment {
             ArrayList<Map<String, String>> list = Cart.get_all(db);
             long total_price = Cart.get_total(db);
 
+            if (list.isEmpty()) {
+                refresh_layout.setRefreshing(false);
+                return;
+            }
+
             requireActivity().runOnUiThread(() -> {
                 list_cart.setAdapter(new SimpleAdapter(
                     requireContext(), list, R.layout.list_products,
-                    new String[]{"cart_id", "product_id", "product_name", "product_price", "product_amount", "total_price"},
-                    new int[]{R.id.product_category, R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_description}
+                    new String[]{"cart_id", "product_id", "product_name", "product_stock", "product_price", "product_amount", "total_price"},
+                    new int[]{R.id.product_category, R.id.product_id, R.id.product_name, R.id.product_stock, R.id.product_price, R.id.product_rating, R.id.product_description}
                 ));
 
                 ((TextView) view.findViewById(R.id.total_price)).setText(format(total_price));

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -141,9 +142,11 @@ public class ProductActivity extends AppCompatActivity {
         // end
 
         // Toolbar
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) toolbar.setTitle(category);
+        if (toolbar != null) {
+            toolbar.setDisplayHomeAsUpEnabled(true);
+            toolbar.setTitle(category);
+        }
         // end
 
         // List Product
@@ -184,6 +187,7 @@ public class ProductActivity extends AppCompatActivity {
 
                     if (product_stock < 1) {
                         runOnUiThread(() -> {
+                            view.findViewById(R.id.product_color_status).setBackgroundColor(ContextCompat.getColor(this, R.color.red));
                             toast(this, "Not enough stock");
                         });
                     } else runOnUiThread(() -> show_user_form(view));
@@ -253,6 +257,24 @@ public class ProductActivity extends AppCompatActivity {
         } else raw_product_amount.setError(null);
 
         execute(() -> {
+            Cart product_on_cart = db.cartDao().get(Integer.parseInt(product_id));
+            int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
+
+            if (product_on_cart != null) {
+                product_stock -= product_on_cart.quantity;
+            }
+
+            if (product_stock < Integer.parseInt(amount)) {
+                int stock = product_stock;
+                runOnUiThread(() -> {
+                    toast(this, "Not enough stock");
+                    raw_product_amount.setError("Not enough stock");
+                    raw_product_amount.setText(String.valueOf(stock));
+                });
+
+                return;
+            }
+
             Cart cart = new Cart();
 
             // Menambah jumlah jika pada cart sudah ada produk yang sama.

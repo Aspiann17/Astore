@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
     private void show_card() {
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         String[] categories = new String[]{
-            "Makanan", "Minuman", "Pakaian","Elektronik"
+            "Makanan", "Minuman", "Pakaian", "Elektronik", "Rumah Tangga"
         };
 
         for (String category : categories) {
