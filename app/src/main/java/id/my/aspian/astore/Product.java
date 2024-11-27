@@ -42,9 +42,17 @@ public class Product {
         List<Product> product_data = db.productDao().get(category);
 
         for (Product product : product_data) {
+            Cart product_on_cart = db.cartDao().get(product.id);
+            int stock = product.stock;
+
+            if (product_on_cart != null) {
+                stock -= product_on_cart.quantity;
+            }
+
+            String final_stock = String.valueOf(stock);
             list.add(new HashMap<>() {{
                 put("product_id", String.valueOf(product.id));
-                put("product_stock", String.valueOf(product.stock));
+                put("product_stock", final_stock);
                 put("product_name", product.name);
                 put("product_price", format(product.price));
                 put("product_rating", star(product.rating));

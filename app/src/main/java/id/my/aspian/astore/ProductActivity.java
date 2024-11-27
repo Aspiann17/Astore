@@ -238,12 +238,18 @@ public class ProductActivity extends AppCompatActivity {
 
         execute(() -> {
             int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
+            Cart product_on_cart = db.cartDao().get(Integer.parseInt(product_id));
+
+            if (product_on_cart != null) {
+                product_stock -= product_on_cart.quantity;
+            }
 
             if (product_stock < Integer.parseInt(amount)) {
+                int stock = product_stock;
                 runOnUiThread(() -> {
                     toast(this, "Not enough stock");
                     raw_product_amount.setError("Not enough stock");
-                    raw_product_amount.setText(String.valueOf(product_stock));
+                    raw_product_amount.setText(String.valueOf(stock));
                 });
 
                 return;

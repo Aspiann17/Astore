@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -17,6 +18,10 @@ public class Utils {
         for (String message : messages) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static void toast(Context context, int... message) {
+        toast(context, Arrays.toString(message));
     }
 
     public static String format(long number) {
