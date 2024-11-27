@@ -11,7 +11,8 @@
         android:id="@+id/nav_list_all"
         android:icon="@drawable/ic_list"
         android:iconTint="@color/blue"
-        android:title="All" />
+        android:title="All"
+        android:visible="false" />
 
     <item
         android:id="@+id/nav_cart"

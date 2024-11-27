@@ -19,6 +19,9 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE category = :category")
     List<Product> get(String category);
 
+    @Query("SELECT * FROM products WHERE name LIKE :name AND category = :category")
+    List<Product> get(String name, String category);
+
     @Query("SELECT * FROM products WHERE name LIKE :name")
     List<Product> get_all(String name);
 
