@@ -35,3 +35,4 @@ Thanks to [Malsoryz](https://github.com/Malsoryz/)
 - https://developer.android.com/guide/fragments/appbar?hl=id#java
 - https://stackoverflow.com/questions/40202294/set-selected-item-in-android-bottomnavigationview
 - https://stackoverflow.com/questions/2173936/how-to-set-background-color-of-a-view
+- https://stackoverflow.com/questions/41123160/android-get-child-items-in-listview
