@@ -19,6 +19,9 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE category = :category")
     List<Product> get(String category);
 
+    @Query("SELECT * FROM products WHERE name LIKE :name")
+    List<Product> get_all(String name);
+
     @Query("SELECT COUNT(*) FROM products WHERE category = :category")
     int count(String category);
 

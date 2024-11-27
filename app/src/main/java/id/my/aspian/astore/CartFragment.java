@@ -142,7 +142,7 @@ public class CartFragment extends Fragment {
         });
 
         checkout_dialog.findViewById(R.id.close_button).setOnClickListener(v -> {
-            db.cartDao().delete_all();
+            execute(() -> db.cartDao().delete_all());
             checkout_dialog.dismiss();
         });
 
@@ -218,8 +218,10 @@ public class CartFragment extends Fragment {
             long total_price = Cart.get_total(db);
 
             if (list.isEmpty()) {
-                list_cart.setAdapter(null);
-                refresh_layout.setRefreshing(false);
+                requireActivity().runOnUiThread(() -> {
+                    list_cart.setAdapter(null);
+                    refresh_layout.setRefreshing(false);
+                });
                 return;
             }
 
