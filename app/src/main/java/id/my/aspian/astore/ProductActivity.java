@@ -169,8 +169,26 @@ public class ProductActivity extends AppCompatActivity {
         });
 
         list_product.setOnItemClickListener((parent, view, position, id) -> {
+            product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
+
             if (role.equals("admin")) show_update_form(view);
-            else if (role.equals("user")) show_user_form(view);
+            else if (role.equals("user")) {
+
+                execute(() -> {
+                    int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
+                    Cart product_on_cart = db.cartDao().get(Integer.parseInt(product_id));
+
+                    if (product_on_cart != null) {
+                        product_stock -= product_on_cart.quantity;
+                    }
+
+                    if (product_stock < 1) {
+                        runOnUiThread(() -> {
+                            toast(this, "Not enough stock");
+                        });
+                    } else runOnUiThread(() -> show_user_form(view));
+                });
+            }
         });
         // end
 
@@ -204,14 +222,12 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     private void show_user_form(@NonNull View view) {
-        product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
         String product_name = ((TextView) view.findViewById(R.id.product_name)).getText().toString();
         ((TextView) user_dialog.findViewById(R.id.product_name)).setText(product_name);
         user_dialog.show();
     }
 
     private void show_update_form(@NonNull View view) {
-        product_id = ((TextView) view.findViewById(R.id.product_id)).getText().toString();
         action = "update";
 
         execute(() -> {
@@ -237,24 +253,6 @@ public class ProductActivity extends AppCompatActivity {
         } else raw_product_amount.setError(null);
 
         execute(() -> {
-            int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
-            Cart product_on_cart = db.cartDao().get(Integer.parseInt(product_id));
-
-            if (product_on_cart != null) {
-                product_stock -= product_on_cart.quantity;
-            }
-
-            if (product_stock < Integer.parseInt(amount)) {
-                int stock = product_stock;
-                runOnUiThread(() -> {
-                    toast(this, "Not enough stock");
-                    raw_product_amount.setError("Not enough stock");
-                    raw_product_amount.setText(String.valueOf(stock));
-                });
-
-                return;
-            }
-
             Cart cart = new Cart();
 
             // Menambah jumlah jika pada cart sudah ada produk yang sama.
