@@ -28,12 +28,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class ProductActivity extends AppCompatActivity {
-    TextInputEditText raw_product_name, raw_product_price, raw_product_rating, raw_product_description, raw_product_amount;
+    TextInputEditText raw_product_name, raw_product_stock, raw_product_price, raw_product_rating, raw_product_description, raw_product_amount;
     SwipeRefreshLayout refresh_layout;
     ListView list_product;
     Dialog admin_dialog, user_dialog;
@@ -42,7 +41,6 @@ public class ProductActivity extends AppCompatActivity {
     SharedPreferences preferences;
     ArrayList<Map<String, String>> product_data;
     String category, action, product_id, role = null;
-
 
     // Toolbar
     // Back Button
@@ -72,7 +70,8 @@ public class ProductActivity extends AppCompatActivity {
             // Mengosongkan Input
             for (TextInputEditText i : new TextInputEditText[]{
                     raw_product_name, raw_product_price,
-                    raw_product_rating, raw_product_description
+                    raw_product_rating, raw_product_description,
+                    raw_product_stock
             }) i.setText("");
 
             action = "add";
@@ -83,6 +82,7 @@ public class ProductActivity extends AppCompatActivity {
             execute(() -> {
                 Product product = new Product();
                 product.name = "Rawr";
+                product.stock = 17;
                 product.price = 2000;
                 product.rating = 5;
                 product.category = category.toLowerCase();
@@ -148,7 +148,7 @@ public class ProductActivity extends AppCompatActivity {
 
         // List Product
         list_product = findViewById(R.id.list_product);
-        list_product.setEmptyView(findViewById(R.id.empty_product));
+        list_product.setEmptyView(findViewById(R.id.empty_list));
 
         // Event
 
@@ -182,6 +182,7 @@ public class ProductActivity extends AppCompatActivity {
         ((TextView) admin_dialog.findViewById(R.id.dialog_title)).setText(category);
 
         raw_product_name = admin_dialog.findViewById(R.id.product_name);
+        raw_product_stock = admin_dialog.findViewById(R.id.product_stock);
         raw_product_price = admin_dialog.findViewById(R.id.product_price);
         raw_product_rating = admin_dialog.findViewById(R.id.product_rating);
         raw_product_description = admin_dialog.findViewById(R.id.product_description);
@@ -218,6 +219,7 @@ public class ProductActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 raw_product_name.setText(product.name);
+                raw_product_stock.setText(String.valueOf(product.stock));
                 raw_product_price.setText(String.valueOf(product.price));
                 raw_product_rating.setText(String.valueOf(product.rating));
                 raw_product_description.setText(product.description);
@@ -232,24 +234,37 @@ public class ProductActivity extends AppCompatActivity {
         if (amount.isEmpty()) {
             raw_product_amount.setError("Amount cannot be empty");
             return;
-        } else {
-            raw_product_amount.setError(null);
-        }
+        } else raw_product_amount.setError(null);
 
         execute(() -> {
-            Cart cart = new Cart();
-            List<Integer> product_id_list = db.cartDao().getAllProductId();
+            int product_stock = db.productDao().get(Integer.parseInt(product_id)).stock;
 
-            if (product_id_list.contains(Integer.parseInt(product_id))) {
-                cart = db.cartDao().get(Integer.parseInt(product_id));
-                cart.quantity += Integer.parseInt(amount);
-                db.cartDao().update(cart);
+            if (product_stock < Integer.parseInt(amount)) {
+                runOnUiThread(() -> {
+                    toast(this, "Not enough stock");
+                    raw_product_amount.setError("Not enough stock");
+                    raw_product_amount.setText(String.valueOf(product_stock));
+                });
+
                 return;
             }
 
-            cart.product_id = Integer.parseInt(product_id);
-            cart.quantity = Integer.parseInt(amount);
-            db.cartDao().insert(cart);
+            Cart cart = new Cart();
+
+            // Menambah jumlah jika pada cart sudah ada produk yang sama.
+            if (db.cartDao().get(Integer.parseInt(product_id)) != null) {
+                cart = db.cartDao().get(Integer.parseInt(product_id));
+                cart.quantity += Integer.parseInt(amount);
+                db.cartDao().update(cart);
+            } else {
+                // Menambahkan ke cart jika belum ada.
+                cart.product_id = Integer.parseInt(product_id);
+                cart.quantity = Integer.parseInt(amount);
+                db.cartDao().insert(cart);
+            }
+
+            // Melakukan reset pada input jika operasi berhasil.
+            runOnUiThread(() -> raw_product_amount.setText(""));
         });
 
         user_dialog.dismiss();
@@ -258,6 +273,7 @@ public class ProductActivity extends AppCompatActivity {
     private void handle_admin_form() {
         try {
             String product_name = Objects.requireNonNull(raw_product_name.getText()).toString().trim();
+            String product_stock = Objects.requireNonNull(raw_product_stock.getText()).toString().trim();
             String product_price = Objects.requireNonNull(raw_product_price.getText()).toString().trim();
             String product_rating = Objects.requireNonNull(raw_product_rating.getText()).toString().trim();
             String product_description = Objects.requireNonNull(raw_product_description.getText()).toString().trim();
@@ -265,6 +281,9 @@ public class ProductActivity extends AppCompatActivity {
             // Validation
             if (product_name.isEmpty()) {
                 raw_product_name.setError("Name must be filled");
+                return;
+            } else if (product_stock.isEmpty()) {
+                raw_product_stock.setError("Stock cannot be empty");
                 return;
             } else if (product_price.isEmpty()) {
                 raw_product_price.setError("Price cannot be empty");
@@ -284,12 +303,14 @@ public class ProductActivity extends AppCompatActivity {
             } else {
                 for (TextInputEditText i : new TextInputEditText[]{
                         raw_product_name, raw_product_price,
-                        raw_product_rating, raw_product_description
+                        raw_product_rating, raw_product_description,
+                        raw_product_stock
                 }) i.setError(null);
             }
 
             Product product = new Product();
             product.name = product_name;
+            product.stock = Integer.parseInt(product_stock);
             product.price = Integer.parseInt(product_price);
             product.rating = Integer.parseInt(product_rating);
             product.category = category.toLowerCase();
@@ -325,8 +346,8 @@ public class ProductActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 list_product.setAdapter(new SimpleAdapter(
                     this, product_data, R.layout.list_products,
-                    new String[]{"product_id", "product_name", "product_price", "product_rating", "product_category", "product_description"},
-                    new int[]{R.id.product_id, R.id.product_name, R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
+                    new String[]{"product_id", "product_name", "product_stock","product_price", "product_rating", "product_category", "product_description"},
+                    new int[]{R.id.product_id, R.id.product_name, R.id.product_stock,R.id.product_price, R.id.product_rating, R.id.product_category, R.id.product_description}
                 ));
 
                 refresh_layout.setRefreshing(false);

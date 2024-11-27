@@ -76,7 +76,7 @@ public class HomeFragment extends Fragment {
         refresh_layout.setOnRefreshListener(this::refresh);
 
         list_category = view.findViewById(R.id.list_category);
-        list_category.setEmptyView(view.findViewById(R.id.empty_category));
+        list_category.setEmptyView(view.findViewById(R.id.empty_list));
         list_category.setOnItemClickListener((parent, category_view, position, id) -> {
             String category_title = ((TextView) category_view.findViewById(R.id.category_title)).getText().toString();
 

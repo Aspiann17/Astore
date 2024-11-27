@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     Menu bottom_menu;
+    BottomNavigationView bottom_nav;
 
     // Option
     @Override
@@ -38,10 +39,12 @@ public class MainActivity extends AppCompatActivity {
         int item_id = item.getItemId();
         if (item_id == R.id.admin_mode) {
             editor.putString("role", "admin");
+            bottom_nav.setSelectedItemId(R.id.nav_home);
             bottom_menu.findItem(R.id.nav_cart).setVisible(false);
             bottom_menu.findItem(R.id.nav_profile).setVisible(false);
         } else if (item_id == R.id.user_mode) {
             editor.putString("role", "user");
+            bottom_nav.setSelectedItemId(R.id.nav_home);
             bottom_menu.findItem(R.id.nav_cart).setVisible(true);
             bottom_menu.findItem(R.id.nav_profile).setVisible(true);
         }
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(), StoreDatabase.class, "store").build();
 
         // Navigation
-        BottomNavigationView bottom_nav = findViewById(R.id.bottom_navigation);
+        bottom_nav = findViewById(R.id.bottom_navigation);
         bottom_nav.setOnItemSelectedListener(item -> {
 
             int item_id = item.getItemId();
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         if (
             intent_data != null &&
             intent_data.containsKey("action") &&
-            Objects.equals(intent_data.getString("action"), "cart")
+            intent_data.getString("action", "home").equals("cart")
         ) bottom_nav.setSelectedItemId(R.id.nav_cart);
 
         else move_fragment(new HomeFragment());

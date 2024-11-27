@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
@@ -31,7 +32,8 @@
             app:cursorColor="@color/primary"
             app:cursorErrorColor="@color/danger"
             app:errorEnabled="true"
-            app:hintEnabled="true">
+            app:hintEnabled="true"
+            tools:ignore="HardcodedText">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_name"
@@ -44,13 +46,36 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="Stock"
+            app:cursorColor="@color/primary"
+            app:cursorErrorColor="@color/danger"
+            app:errorEnabled="true"
+            app:hintEnabled="true"
+            app:suffixText="pcs"
+            app:suffixTextColor="@color/black"
+            tools:ignore="HardcodedText">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_stock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="@color/black" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="Price"
             app:cursorColor="@color/primary"
             app:cursorErrorColor="@color/danger"
             app:errorEnabled="true"
             app:hintEnabled="true"
             app:prefixText="Rp"
-            app:prefixTextColor="@color/black">
+            app:prefixTextColor="@color/black"
+            tools:ignore="HardcodedText">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_price"
@@ -71,7 +96,8 @@
             app:errorEnabled="true"
             app:hintEnabled="true"
             app:suffixText="@string/star"
-            app:suffixTextColor="@color/black">
+            app:suffixTextColor="@color/black"
+            tools:ignore="HardcodedText">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_rating"
@@ -90,13 +116,14 @@
             app:cursorColor="@color/primary"
             app:cursorErrorColor="@color/danger"
             app:errorEnabled="true"
-            app:hintEnabled="true">
+            app:hintEnabled="true"
+            tools:ignore="HardcodedText">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:textColor="@color/black" />
 
         </com.google.android.material.textfield.TextInputLayout>

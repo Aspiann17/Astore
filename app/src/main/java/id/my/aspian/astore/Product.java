@@ -22,10 +22,13 @@ public class Product {
     @ColumnInfo(name = "name")
     public String name;
 
-    @ColumnInfo(name = "price")
+    @ColumnInfo(name = "stock", defaultValue = "0")
+    public int stock;
+
+    @ColumnInfo(name = "price", defaultValue = "0")
     public int price;
 
-    @ColumnInfo(name = "rating")
+    @ColumnInfo(name = "rating", defaultValue = "0")
     public int rating;
 
     @ColumnInfo(name = "category")
@@ -34,24 +37,6 @@ public class Product {
     @ColumnInfo(name = "description")
     public String description;
 
-    public static ArrayList<Map<String, String>> get_all(StoreDatabase db) {
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-        List<Product> product_data = db.productDao().getAll();
-
-        for (Product product : product_data) {
-            list.add(new HashMap<>() {{
-                put("product_id", product.id + "");
-                put("product_name", product.name);
-                put("product_price", format(product.price));
-                put("product_rating", star(product.rating));
-                put("product_category", String.valueOf(product.rating));
-                put("product_description", product.description);
-            }});
-        }
-
-        return list;
-    }
-
     public static ArrayList<Map<String, String>> get_all(StoreDatabase db, String category) {
         ArrayList<Map<String, String>> list = new ArrayList<>();
         List<Product> product_data = db.productDao().get(category);
@@ -59,6 +44,7 @@ public class Product {
         for (Product product : product_data) {
             list.add(new HashMap<>() {{
                 put("product_id", String.valueOf(product.id));
+                put("product_stock", String.valueOf(product.stock));
                 put("product_name", product.name);
                 put("product_price", format(product.price));
                 put("product_rating", star(product.rating));
